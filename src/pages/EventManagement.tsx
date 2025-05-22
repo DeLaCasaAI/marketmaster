@@ -26,6 +26,7 @@ const EventManagement = () => {
   };
 
   const isActive = (event: any) => {
+    // Create date objects with time set to noon to avoid timezone issues
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     

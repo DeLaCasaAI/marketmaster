@@ -3,10 +3,17 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppState } from './AppStateContext';
 import { useLanguage } from './LanguageContext';
+import { format } from 'date-fns';
 
 const EventInfoSection: React.FC = () => {
   const { state } = useAppState();
   const { t } = useLanguage();
+  
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return format(date, 'MMM d, yyyy');
+  };
   
   return (
     <Card className="mb-6">
@@ -21,7 +28,7 @@ const EventInfoSection: React.FC = () => {
           <div className="mt-2 md:mt-0">
             {state.currentEvent && (
               <p className="text-gray-600 font-medium">
-                {new Date(state.currentEvent.startDate).toLocaleDateString()} - {new Date(state.currentEvent.endDate).toLocaleDateString()}
+                {formatDate(state.currentEvent.startDate)} - {formatDate(state.currentEvent.endDate)}
               </p>
             )}
           </div>

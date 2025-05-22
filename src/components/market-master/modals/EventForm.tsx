@@ -45,14 +45,23 @@ const EventForm: React.FC<EventFormProps> = ({
 }) => {
   const { t } = useLanguage();
   const today = new Date();
+  today.setHours(12, 0, 0, 0); // Standardize time to noon to avoid timezone issues
+  
+  // Create standardized dates for the form
+  const getStandardizedDate = (dateString: string | undefined) => {
+    if (!dateString) return today;
+    const date = new Date(dateString);
+    date.setHours(12, 0, 0, 0);
+    return date;
+  };
   
   // Initialize form with default or event data
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: eventData?.name || "",
-      startDate: eventData ? new Date(eventData.startDate) : today,
-      endDate: eventData ? new Date(eventData.endDate) : today,
+      startDate: eventData ? getStandardizedDate(eventData.startDate) : today,
+      endDate: eventData ? getStandardizedDate(eventData.endDate) : today,
       location: eventData?.location || "",
       cost: eventData ? eventData.cost.toString() : "0"
     }
