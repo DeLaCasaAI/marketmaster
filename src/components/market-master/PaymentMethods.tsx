@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Banknote, CreditCard, Smartphone } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { useLanguage } from './LanguageContext';
 
 interface PaymentMethodsProps {
   selected: string;
@@ -10,10 +11,12 @@ interface PaymentMethodsProps {
 }
 
 const PaymentMethods: React.FC<PaymentMethodsProps> = ({ selected, onChange }) => {
+  const { t } = useLanguage();
+  
   const methods = [
-    { id: 'cash', label: 'Cash', icon: <Banknote className="mr-2" size={16} /> },
-    { id: 'transfer', label: 'Transfer', icon: <CreditCard className="mr-2" size={16} /> },
-    { id: 'nequi', label: 'Nequi', icon: <Smartphone className="mr-2" size={16} /> }
+    { id: 'cash', label: t('paymentCash'), icon: <Banknote className="mr-2" size={16} /> },
+    { id: 'transfer', label: t('paymentCard'), icon: <CreditCard className="mr-2" size={16} /> },
+    { id: 'nequi', label: t('paymentVenmo'), icon: <Smartphone className="mr-2" size={16} /> }
   ];
 
   return (

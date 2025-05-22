@@ -4,20 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from 'lucide-react';
 import { useAppState } from './AppStateContext';
 import DiscountModal from './modals/DiscountModal';
+import { useLanguage } from './LanguageContext';
 
 const DiscountList: React.FC = () => {
   const { state, deleteDiscount } = useAppState();
+  const { t } = useLanguage();
   const [editingDiscount, setEditingDiscount] = useState<number | null>(null);
 
   if (state.discounts.length === 0) {
-    return <div className="text-gray-500 italic">No discount packs created yet</div>;
+    return <div className="text-gray-500 italic">{t('noDiscounts')}</div>;
   }
 
   return (
     <div className="space-y-3">
       {state.discounts.map(discount => {
         const product = state.products.find(p => p.id === discount.productId);
-        const productName = product ? product.name : 'Unknown Product';
+        const productName = product ? product.name : t('selectProductPlaceholder');
         
         let discountText = '';
         if (discount.type === 'bundle') {
@@ -55,7 +57,7 @@ const DiscountList: React.FC = () => {
                 size="sm"
                 className="text-red-500 hover:text-red-700"
                 onClick={() => {
-                  if (window.confirm('Are you sure you want to delete this discount?')) {
+                  if (window.confirm(t('confirmDeleteDiscount'))) {
                     deleteDiscount(discount.id);
                   }
                 }}

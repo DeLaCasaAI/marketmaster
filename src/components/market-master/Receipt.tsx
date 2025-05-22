@@ -2,15 +2,17 @@
 import React from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { useAppState } from './AppStateContext';
+import { useLanguage } from './LanguageContext';
 
 const Receipt: React.FC = () => {
   const { state, updateProductQuantity } = useAppState();
+  const { t } = useLanguage();
 
   if (state.currentSale.items.length === 0) {
     return (
       <div className="border border-gray-200 rounded-lg p-4 mb-6 min-h-40">
         <div className="text-center text-gray-500 italic py-8">
-          Add items to begin a sale
+          {t('emptyReceiptMessage')}
         </div>
       </div>
     );
@@ -30,7 +32,7 @@ const Receipt: React.FC = () => {
                 <div className="font-medium">{item.name}</div>
                 {discountApplied && (
                   <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full discount-badge">
-                    SAVED ${item.discountApplied.toFixed(2)}
+                    {t('discountsLabel')} ${item.discountApplied.toFixed(2)}
                   </span>
                 )}
               </div>
@@ -64,15 +66,15 @@ const Receipt: React.FC = () => {
       
       <div className="border-t border-gray-200 mt-4 pt-4">
         <div className="flex justify-between font-semibold">
-          <span>Subtotal:</span>
+          <span>{t('subtotalLabel')}</span>
           <span>${state.currentSale.subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-green-600">
-          <span>Discounts:</span>
+          <span>{t('discountsLabel')}</span>
           <span>-${state.currentSale.discount.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-lg font-bold mt-2">
-          <span>Total:</span>
+          <span>{t('totalLabel')}</span>
           <span>${state.currentSale.total.toFixed(2)}</span>
         </div>
       </div>
