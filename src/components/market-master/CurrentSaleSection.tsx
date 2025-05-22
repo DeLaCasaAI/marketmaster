@@ -9,14 +9,20 @@ import Receipt from './Receipt';
 import QuickAddButtons from './QuickAddButtons';
 import PaymentMethods from './PaymentMethods';
 import { toast } from "sonner";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CurrentSaleSectionProps {
   onCompleteSale: () => void;
+  showQuickAdd?: boolean;
 }
 
-const CurrentSaleSection: React.FC<CurrentSaleSectionProps> = ({ onCompleteSale }) => {
+const CurrentSaleSection: React.FC<CurrentSaleSectionProps> = ({ 
+  onCompleteSale,
+  showQuickAdd = true 
+}) => {
   const { state, addProductToSale, clearCurrentSale, setPaymentMethod } = useAppState();
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   
   const handleCompleteSale = () => {
     if (state.currentSale.items.length === 0) {
@@ -54,11 +60,13 @@ const CurrentSaleSection: React.FC<CurrentSaleSectionProps> = ({ onCompleteSale 
         {/* Receipt Area */}
         <Receipt />
         
-        {/* Quick Add Buttons */}
-        <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-500 mb-2">{t('quickAddTitle')}</h3>
-          <QuickAddButtons onAddToSale={addProductToSale} />
-        </div>
+        {/* Quick Add Buttons - Only show if showQuickAdd is true */}
+        {showQuickAdd && (
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-gray-500 mb-2">{t('quickAddTitle')}</h3>
+            <QuickAddButtons onAddToSale={addProductToSale} />
+          </div>
+        )}
 
         {/* Payment Method */}
         <div>

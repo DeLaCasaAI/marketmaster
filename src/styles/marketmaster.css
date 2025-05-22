@@ -39,3 +39,23 @@
     background-color: #f8f9fa;
     color: #007bff;
 }
+
+/* Floating quick add panel */
+.quick-add-floating {
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 9;
+}
+
+.quick-add-toggle {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 0;
+}
+
+.quick-add-content {
+    transition: max-height 0.3s ease-in-out;
+    overflow-y: auto;
+}
+
