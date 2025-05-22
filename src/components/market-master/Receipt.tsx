@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, Tag } from 'lucide-react';
 import { useAppState } from './AppStateContext';
 import { useLanguage } from './LanguageContext';
 
@@ -31,7 +31,8 @@ const Receipt: React.FC = () => {
               <div className="flex items-center">
                 <div className="font-medium">{item.name}</div>
                 {discountApplied && (
-                  <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full discount-badge">
+                  <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full discount-badge flex items-center">
+                    <Tag size={12} className="mr-1" />
                     {t('discountsLabel')} ${item.discountApplied.toFixed(2)}
                   </span>
                 )}

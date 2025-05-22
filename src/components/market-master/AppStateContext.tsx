@@ -192,33 +192,77 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Apply discounts if any
       const applicableDiscounts = state.discounts.filter(d => d.productId === product.id);
       
-      for (const discount of applicableDiscounts) {
-        if (discount.type === 'bundle') {
-          const bundleCount = Math.floor(item.quantity / (discount.params.quantity || 1));
-          if (bundleCount > 0) {
-            const originalPrice = product.price * (discount.params.quantity || 1);
-            const discountAmount = originalPrice - (discount.params.price || 0);
-            item.discountApplied += discountAmount * bundleCount;
-            totalDiscount += discountAmount * bundleCount;
+      if (applicableDiscounts.length > 0) {
+        // Handle bundle discounts specially
+        const bundleDiscounts = applicableDiscounts.filter(d => d.type === 'bundle');
+        
+        if (bundleDiscounts.length > 0) {
+          // Find the most beneficial bundle discount for this quantity
+          let maxDiscount = 0;
+          let bestDiscount = null;
+          
+          for (const discount of bundleDiscounts) {
+            const bundleSize = discount.params.quantity || 1;
+            const bundlePrice = discount.params.price || 0;
+            const bundleCount = Math.floor(item.quantity / bundleSize);
+            
+            if (bundleCount > 0) {
+              const regularPrice = product.price * bundleSize * bundleCount;
+              const discountedPrice = bundlePrice * bundleCount;
+              const totalSavings = regularPrice - discountedPrice;
+              
+              if (totalSavings > maxDiscount) {
+                maxDiscount = totalSavings;
+                bestDiscount = {
+                  discount,
+                  bundleCount,
+                  totalSavings
+                };
+              }
+            }
           }
-        } else if (discount.type === 'percentage') {
-          if (item.quantity >= 1) {
-            const discountAmount = (product.price * item.quantity) * ((discount.params.percentage || 0) / 100);
-            item.discountApplied += discountAmount;
-            totalDiscount += discountAmount;
-          }
-        } else if (discount.type === 'fixed') {
-          if (item.quantity >= 1) {
-            const discountAmount = (discount.params.amount || 0) * item.quantity;
+          
+          // Apply the best bundle discount
+          if (bestDiscount) {
+            const bundleSize = bestDiscount.discount.params.quantity || 1;
+            const bundlePrice = bestDiscount.discount.params.price || 0;
+            const bundleCount = bestDiscount.bundleCount;
+            
+            const discountAmount = bestDiscount.totalSavings;
             item.discountApplied += discountAmount;
             totalDiscount += discountAmount;
             
-            // Check if this is a combo discount and the other product is also in the cart
-            if (discount.params.withProduct) {
-              const withProductInCart = updatedItems.some(i => i.productId === discount.params.withProduct);
-              if (!withProductInCart) {
-                totalDiscount -= discountAmount;
-                item.discountApplied -= discountAmount;
+            // Calculate remaining items that are not part of bundle
+            const remainingItems = item.quantity - (bundleSize * bundleCount);
+            
+            // Don't apply other discount types to items that were part of the bundle
+            if (remainingItems <= 0) {
+              continue;
+            }
+          }
+        }
+        
+        // Apply other discount types (percentage, fixed)
+        for (const discount of applicableDiscounts) {
+          if (discount.type === 'percentage') {
+            if (item.quantity >= 1) {
+              const discountAmount = (product.price * item.quantity) * ((discount.params.percentage || 0) / 100);
+              item.discountApplied += discountAmount;
+              totalDiscount += discountAmount;
+            }
+          } else if (discount.type === 'fixed') {
+            if (item.quantity >= 1) {
+              const discountAmount = (discount.params.amount || 0) * item.quantity;
+              item.discountApplied += discountAmount;
+              totalDiscount += discountAmount;
+              
+              // Check if this is a combo discount and the other product is also in the cart
+              if (discount.params.withProduct) {
+                const withProductInCart = updatedItems.some(i => i.productId === discount.params.withProduct);
+                if (!withProductInCart) {
+                  totalDiscount -= discountAmount;
+                  item.discountApplied -= discountAmount;
+                }
               }
             }
           }
