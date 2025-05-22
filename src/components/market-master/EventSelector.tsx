@@ -26,8 +26,13 @@ const EventSelector: React.FC<EventSelectorProps> = ({
   const { t } = useLanguage();
 
   const formatEventDate = (startDate: string, endDate: string) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    // Parse the date strings properly (assuming YYYY-MM-DD format)
+    const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+    const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+    
+    // JavaScript months are 0-indexed (0 = January, 11 = December)
+    const start = new Date(startYear, startMonth - 1, startDay);
+    const end = new Date(endYear, endMonth - 1, endDay);
     
     if (start.toDateString() === end.toDateString()) {
       return format(start, 'MMM d, yyyy');

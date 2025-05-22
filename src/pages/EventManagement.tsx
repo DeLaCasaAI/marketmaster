@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppState } from '@/components/market-master/AppStateContext';
 import { useLanguage } from '@/components/market-master/LanguageContext';
@@ -26,22 +25,32 @@ const EventManagement = () => {
   };
 
   const isActive = (event: any) => {
-    // Create date objects with time set to noon to avoid timezone issues
+    // Parse dates properly to avoid timezone issues
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const startDate = new Date(event.startDate);
+    // Parse the date strings properly (assuming YYYY-MM-DD format)
+    const [startYear, startMonth, startDay] = event.startDate.split('-').map(Number);
+    const [endYear, endMonth, endDay] = event.endDate.split('-').map(Number);
+    
+    // JavaScript months are 0-indexed (0 = January, 11 = December)
+    const startDate = new Date(startYear, startMonth - 1, startDay);
     startDate.setHours(0, 0, 0, 0);
     
-    const endDate = new Date(event.endDate);
+    const endDate = new Date(endYear, endMonth - 1, endDay);
     endDate.setHours(23, 59, 59, 999);
     
     return today >= startDate && today <= endDate;
   };
 
   const formatEventDate = (startDate: string, endDate: string) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    // Parse the date strings properly (assuming YYYY-MM-DD format)
+    const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+    const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+    
+    // JavaScript months are 0-indexed (0 = January, 11 = December)
+    const start = new Date(startYear, startMonth - 1, startDay);
+    const end = new Date(endYear, endMonth - 1, endDay);
     
     if (start.toDateString() === end.toDateString()) {
       return format(start, 'MMM d, yyyy');

@@ -11,7 +11,10 @@ const EventInfoSection: React.FC = () => {
   
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
+    // Parse the date string properly (assuming YYYY-MM-DD format)
+    const [year, month, day] = dateString.split('-').map(Number);
+    // JavaScript months are 0-indexed (0 = January, 11 = December)
+    const date = new Date(year, month - 1, day);
     return format(date, 'MMM d, yyyy');
   };
   

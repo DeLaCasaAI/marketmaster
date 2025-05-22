@@ -44,14 +44,17 @@ const EventForm: React.FC<EventFormProps> = ({
   onCancel 
 }) => {
   const { t } = useLanguage();
-  const today = new Date();
-  today.setHours(12, 0, 0, 0); // Standardize time to noon to avoid timezone issues
   
-  // Create standardized dates for the form
-  const getStandardizedDate = (dateString: string | undefined) => {
+  // Create a date object for today that won't be affected by timezone issues
+  const today = new Date();
+  
+  // Make properly parsed dates from stored ISO strings
+  const getDateFromISOString = (dateString: string | undefined) => {
     if (!dateString) return today;
-    const date = new Date(dateString);
-    date.setHours(12, 0, 0, 0);
+    // Parse the date and ensure it's treated as UTC
+    const [year, month, day] = dateString.split('-').map(Number);
+    // JavaScript months are 0-indexed (0 = January, 11 = December)
+    const date = new Date(year, month - 1, day);
     return date;
   };
   
@@ -60,8 +63,8 @@ const EventForm: React.FC<EventFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: eventData?.name || "",
-      startDate: eventData ? getStandardizedDate(eventData.startDate) : today,
-      endDate: eventData ? getStandardizedDate(eventData.endDate) : today,
+      startDate: eventData?.startDate ? getDateFromISOString(eventData.startDate) : today,
+      endDate: eventData?.endDate ? getDateFromISOString(eventData.endDate) : today,
       location: eventData?.location || "",
       cost: eventData ? eventData.cost.toString() : "0"
     }
