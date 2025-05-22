@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useAppState } from './AppStateContext';
+import { useLanguage } from './LanguageContext';
 
 interface QuickAddButtonsProps {
   onAddToSale: (productId: number) => void;
@@ -8,9 +9,10 @@ interface QuickAddButtonsProps {
 
 const QuickAddButtons: React.FC<QuickAddButtonsProps> = ({ onAddToSale }) => {
   const { state } = useAppState();
+  const { t } = useLanguage();
 
   if (state.products.length === 0) {
-    return <div className="text-gray-500 italic">No products available</div>;
+    return <div className="text-gray-500 italic">{t('noProducts')}</div>;
   }
 
   return (
