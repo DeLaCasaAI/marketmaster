@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -20,10 +20,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useAppState } from '../AppStateContext';
+import { useLanguage } from '../LanguageContext';
 
 interface EventModalProps {
   isOpen: boolean;
   onClose: () => void;
+  eventId?: number | null;
 }
 
 const formSchema = z.object({
@@ -37,12 +39,15 @@ const formSchema = z.object({
   )
 });
 
-const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
-  const { createEvent } = useAppState();
+type FormValues = z.infer<typeof formSchema>;
+
+const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, eventId }) => {
+  const { state, createEvent, updateEvent } = useAppState();
+  const { t } = useLanguage();
   
   const today = new Date().toISOString().split('T')[0];
   
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -53,7 +58,31 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
     }
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  // Load event data when editing
+  useEffect(() => {
+    if (eventId) {
+      const eventToEdit = state.events.find(event => event.id === eventId);
+      if (eventToEdit) {
+        form.reset({
+          name: eventToEdit.name,
+          startDate: eventToEdit.startDate,
+          endDate: eventToEdit.endDate,
+          location: eventToEdit.location || "",
+          cost: eventToEdit.cost.toString()
+        });
+      }
+    } else {
+      form.reset({
+        name: "",
+        startDate: today,
+        endDate: today,
+        location: "",
+        cost: "0"
+      });
+    }
+  }, [eventId, form, today, state.events]);
+
+  const onSubmit = (values: FormValues) => {
     const eventData = {
       name: values.name,
       startDate: values.startDate,
@@ -63,7 +92,12 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
       startTime: new Date().toISOString()
     };
 
-    createEvent(eventData);
+    if (eventId) {
+      updateEvent(eventId, eventData);
+    } else {
+      createEvent(eventData);
+    }
+    
     onClose();
   };
 
@@ -71,7 +105,9 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>New Market Event</DialogTitle>
+          <DialogTitle>
+            {eventId ? t('editEventTitle') : t('newEventModalTitle')}
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -81,7 +117,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Event Name</FormLabel>
+                  <FormLabel>{t('eventNameLabel')}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -94,7 +130,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
               name="startDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Start Date</FormLabel>
+                  <FormLabel>{t('eventStartDateLabel')}</FormLabel>
                   <FormControl>
                     <Input {...field} type="date" />
                   </FormControl>
@@ -107,7 +143,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
               name="endDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>End Date</FormLabel>
+                  <FormLabel>{t('eventEndDateLabel')}</FormLabel>
                   <FormControl>
                     <Input {...field} type="date" />
                   </FormControl>
@@ -120,7 +156,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location</FormLabel>
+                  <FormLabel>{t('eventLocationLabel')}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -133,7 +169,7 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
               name="cost"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Event Cost ($)</FormLabel>
+                  <FormLabel>{t('eventCostLabel')} ($)</FormLabel>
                   <FormControl>
                     <Input {...field} type="number" step="1000" min="0" />
                   </FormControl>
@@ -143,10 +179,10 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose }) => {
 
             <DialogFooter className="flex justify-end space-x-3 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                {t('cancelButton')}
               </Button>
               <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                Start Event
+                {eventId ? t('updateEventButton') : t('startEventButton')}
               </Button>
             </DialogFooter>
           </form>

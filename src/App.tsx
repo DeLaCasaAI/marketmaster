@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import MarketMaster from "./pages/MarketMaster";
+import EventManagement from "./pages/EventManagement";
 import NotFound from "./pages/NotFound";
 import { AppStateProvider } from "./components/market-master/AppStateContext";
 import { LanguageProvider } from "./components/market-master/LanguageContext";
@@ -23,6 +24,11 @@ const App = () => (
             <Route path="/market-master" element={
               <AppStateProvider>
                 <MarketMaster />
+              </AppStateProvider>
+            } />
+            <Route path="/event-management" element={
+              <AppStateProvider>
+                <EventManagement />
               </AppStateProvider>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

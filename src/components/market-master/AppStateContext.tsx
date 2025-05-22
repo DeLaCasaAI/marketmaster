@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Define types
@@ -66,6 +65,7 @@ export type AppState = {
   discounts: Discount[];
   currentSale: Sale;
   salesHistory: SaleRecord[];
+  events: Event[];
   currentEvent: Event | null;
   eventStartDate: string | null;
   eventEndDate: string | null;
@@ -87,9 +87,14 @@ type AppStateContextType = {
   completeSale: () => void;
   setPaymentMethod: (method: string) => void;
   createEvent: (event: Omit<Event, "id">) => void;
+  updateEvent: (id: number, event: Omit<Event, "id">) => void;
+  deleteEvent: (id: number) => void;
+  setCurrentEvent: (eventId: number | null) => void;
   calculateTodaysSales: () => number;
+  calculateEventSales: (eventId: number) => number;
   calculateEventProfit: (sale: Sale, event: Event | null) => number;
   updateStateFromImport: (data: any) => void;
+  getSalesByEventId: (eventId: number) => SaleRecord[];
 };
 
 // Initialize context with default values
@@ -124,6 +129,7 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       total: 0
     },
     salesHistory: [],
+    events: [],
     currentEvent: null,
     eventStartDate: null,
     eventEndDate: null,
@@ -141,9 +147,10 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         products: parsedData.products || [],
         discounts: parsedData.discounts || [],
         salesHistory: parsedData.salesHistory || [],
-        currentEvent: parsedData.currentEvent || null,
-        eventStartDate: parsedData.eventStartDate || null,
-        eventEndDate: parsedData.eventEndDate || null
+        events: parsedData.events || [],
+        currentEvent: null, // Reset current event on load
+        eventStartDate: null,
+        eventEndDate: null
       }));
     } else {
       // Load sample data if no data in localStorage
@@ -155,17 +162,64 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
+  // Check if any event is currently active and set it
+  useEffect(() => {
+    if (state.events.length > 0) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const activeEvent = state.events.find(event => {
+        const startDate = new Date(event.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        
+        const endDate = new Date(event.endDate);
+        endDate.setHours(23, 59, 59, 999);
+        
+        return today >= startDate && today <= endDate;
+      });
+      
+      if (activeEvent && !state.currentEvent) {
+        setState(prevState => ({
+          ...prevState,
+          currentEvent: activeEvent,
+          eventStartDate: activeEvent.startDate,
+          eventEndDate: activeEvent.endDate
+        }));
+      } else if (!activeEvent && state.currentEvent) {
+        // If there's no active event but we have a current event set
+        // Check if the current event is still valid
+        const currentEventStillValid = state.events.find(event => {
+          const startDate = new Date(event.startDate);
+          startDate.setHours(0, 0, 0, 0);
+          
+          const endDate = new Date(event.endDate);
+          endDate.setHours(23, 59, 59, 999);
+          
+          const eventId = state.currentEvent?.id || -1;
+          return event.id === eventId && today >= startDate && today <= endDate;
+        });
+        
+        if (!currentEventStillValid) {
+          setState(prevState => ({
+            ...prevState,
+            currentEvent: null,
+            eventStartDate: null,
+            eventEndDate: null
+          }));
+        }
+      }
+    }
+  }, [state.events, state.currentEvent]);
+
   // Save to localStorage whenever state changes
   useEffect(() => {
     localStorage.setItem('marketMasterData', JSON.stringify({
       products: state.products,
       discounts: state.discounts,
       salesHistory: state.salesHistory,
-      currentEvent: state.currentEvent,
-      eventStartDate: state.eventStartDate,
-      eventEndDate: state.eventEndDate
+      events: state.events
     }));
-  }, [state.products, state.discounts, state.salesHistory, state.currentEvent, state.eventStartDate, state.eventEndDate]);
+  }, [state.products, state.discounts, state.salesHistory, state.events]);
 
   // Calculate sale totals and apply discounts
   const calculateSaleTotals = (items: SaleItem[]) => {
@@ -477,10 +531,68 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     setState(prevState => ({
       ...prevState,
-      currentEvent: newEvent,
-      eventStartDate: newEvent.startDate,
-      eventEndDate: newEvent.endDate
+      events: [...prevState.events, newEvent]
     }));
+  };
+
+  // Update an existing event
+  const updateEvent = (id: number, event: Omit<Event, "id">) => {
+    setState(prevState => {
+      const updatedEvents = prevState.events.map(e => 
+        e.id === id ? { ...event, id } : e
+      );
+      
+      return {
+        ...prevState,
+        events: updatedEvents,
+        // If the current event is being updated, update it as well
+        currentEvent: prevState.currentEvent?.id === id ? 
+          { ...event, id } : prevState.currentEvent
+      };
+    });
+  };
+
+  // Delete an event
+  const deleteEvent = (id: number) => {
+    setState(prevState => {
+      // Remove event from events list
+      const updatedEvents = prevState.events.filter(e => e.id !== id);
+      
+      // If the deleted event was the current event, reset current event
+      const updatedCurrentEvent = prevState.currentEvent?.id === id ? 
+        null : prevState.currentEvent;
+      
+      return {
+        ...prevState,
+        events: updatedEvents,
+        currentEvent: updatedCurrentEvent,
+        eventStartDate: updatedCurrentEvent?.startDate || null,
+        eventEndDate: updatedCurrentEvent?.endDate || null
+      };
+    });
+  };
+
+  // Set current event
+  const setCurrentEvent = (eventId: number | null) => {
+    setState(prevState => {
+      if (eventId === null) {
+        return {
+          ...prevState,
+          currentEvent: null,
+          eventStartDate: null,
+          eventEndDate: null
+        };
+      }
+      
+      const selectedEvent = prevState.events.find(e => e.id === eventId) || null;
+      
+      return {
+        ...prevState,
+        currentEvent: selectedEvent,
+        eventStartDate: selectedEvent?.startDate || null,
+        eventEndDate: selectedEvent?.endDate || null
+      };
+    });
   };
 
   // Calculate total sales for today
@@ -494,6 +606,18 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return saleDate >= today;
       })
       .reduce((sum, sale) => sum + sale.total, 0);
+  };
+
+  // Calculate total sales for a specific event
+  const calculateEventSales = (eventId: number) => {
+    return state.salesHistory
+      .filter(sale => sale.eventId === eventId)
+      .reduce((sum, sale) => sum + sale.total, 0);
+  };
+  
+  // Get sales records for a specific event
+  const getSalesByEventId = (eventId: number) => {
+    return state.salesHistory.filter(sale => sale.eventId === eventId);
   };
 
   // Calculate profit for an event
@@ -519,9 +643,10 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       products: data.products || [],
       discounts: data.discounts || [],
       salesHistory: data.salesHistory || [],
-      currentEvent: data.currentEvent || null,
-      eventStartDate: data.eventStartDate || null,
-      eventEndDate: data.eventEndDate || null
+      events: data.events || [],
+      currentEvent: null,
+      eventStartDate: null,
+      eventEndDate: null
     }));
   };
 
@@ -539,9 +664,14 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     completeSale,
     setPaymentMethod,
     createEvent,
+    updateEvent,
+    deleteEvent,
+    setCurrentEvent,
     calculateTodaysSales,
+    calculateEventSales,
     calculateEventProfit,
-    updateStateFromImport
+    updateStateFromImport,
+    getSalesByEventId
   };
 
   return (

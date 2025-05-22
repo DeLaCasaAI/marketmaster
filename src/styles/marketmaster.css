@@ -58,3 +58,23 @@
     transition: max-height 0.3s ease-in-out;
     overflow-y: auto;
 }
+
+/* Event management styles */
+.event-active {
+    border-color: #10b981;
+    border-width: 2px;
+}
+
+.event-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Event selector */
+.event-selector {
+    border-color: #10b981;
+}

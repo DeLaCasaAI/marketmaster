@@ -1,148 +1,181 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Plus, BarChart3, Download, Upload, Menu } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, Calendar, BarChart2, Download, Upload, Hammer } from 'lucide-react';
 import { useAppState } from './AppStateContext';
-import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from './LanguageContext';
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import LanguageSwitcher from './LanguageSwitcher';
+import { toast } from "@/hooks/use-toast";
+import { Link } from 'react-router-dom';
 
-interface HeaderSectionProps {
+interface HeaderProps {
   onNewEvent: () => void;
   onShowSalesReport: () => void;
 }
 
-const HeaderSection: React.FC<HeaderSectionProps> = ({ onNewEvent, onShowSalesReport }) => {
-  const { calculateTodaysSales, state, updateStateFromImport } = useAppState();
+const HeaderSection: React.FC<HeaderProps> = ({ onNewEvent, onShowSalesReport }) => {
+  const { state, updateStateFromImport } = useAppState();
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
-  
-  // Event listener for clicking outside the menu
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      const menuButton = document.getElementById('menuButton');
-      const menuDropdown = document.getElementById('menuDropdown');
-      
-      if (menuOpen && 
-          menuButton && 
-          menuDropdown && 
-          !menuButton.contains(event.target as Node) && 
-          !menuDropdown.contains(event.target as Node)) {
-        setMenuOpen(false);
-      }
-    }
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [menuOpen]);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
 
   const handleExportData = () => {
-    const data = JSON.stringify({
+    // Create a download blob with the state data
+    const dataStr = JSON.stringify({
       products: state.products,
       discounts: state.discounts,
       salesHistory: state.salesHistory,
-      currentEvent: state.currentEvent,
-      eventStartDate: state.eventStartDate,
-      eventEndDate: state.eventEndDate,
-      language: state.language
+      events: state.events
     });
     
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'marketmaster_data.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    // Create a temporary link and click it to download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'marketmaster_data.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.success(t('dataImportedSuccessfully'));
-    setMenuOpen(false);
   };
 
-  const handleImportData = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const result = e.target?.result;
-          if (typeof result === 'string') {
-            const data = JSON.parse(result);
-            updateStateFromImport(data);
-            toast.success(t('dataImportedSuccessfully'));
-          }
-        } catch (error) {
-          toast.error(t('errorImportingData') + error);
+  const handleImportData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+      try {
+        if (event.target?.result) {
+          const data = JSON.parse(event.target.result as string);
+          updateStateFromImport(data);
+          toast({
+            title: t('dataImportedSuccessfully')
+          });
         }
-      };
-      reader.readAsText(file);
+      } catch (error) {
+        toast({
+          title: t('errorImportingData') + error,
+          variant: "destructive"
+        });
+      }
     };
-    input.click();
-    setMenuOpen(false);
+    
+    reader.readAsText(file);
+    e.target.value = ''; // Reset the file input
   };
 
   return (
-    <header className="border-b p-4 sticky top-0 z-10 bg-background">
-      <div className="container flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">MarketMaster by DeLaCasa</h1>
+    <header className="bg-green-600 text-white p-4 shadow-md relative">
+      <div className="container mx-auto flex justify-between items-center">
+        <div className="flex items-center">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-white mr-2 p-1 hover:bg-green-700"
+            onClick={toggleMenu}
+          >
+            <Menu size={24} />
+          </Button>
+          <div>
+            <h1 className="text-xl font-bold">{t('headerTitle')}</h1>
+            <p className="text-xs opacity-80">{t('headerSubtitle')}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-medium hidden sm:inline-block">
+            {t('todaysSalesLabel')} ${state.salesHistory 
+              .filter(s => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const saleDate = new Date(s.timestamp);
+                return saleDate >= today;
+              })
+              .reduce((sum, s) => sum + s.total, 0)
+              .toFixed(2)}
+          </span>
           <LanguageSwitcher />
-          <div className="bg-white p-3 rounded-lg shadow-sm">
-            <span className="text-gray-500">{t('todaysSalesLabel')}</span>
-            <span className="font-bold text-green-600 ml-2">${calculateTodaysSales().toFixed(2)}</span>
-          </div>
-          <div className="relative">
-            <Button 
-              id="menuButton"
-              onClick={() => setMenuOpen(!menuOpen)} 
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-            
-            {menuOpen && (
-              <div id="menuDropdown" className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <div className="py-1">
-                  <button 
-                    onClick={() => { onNewEvent(); setMenuOpen(false); }}
-                    className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-green-600 w-full text-left"
-                  >
-                    <Plus className="inline mr-2 h-4 w-4" /> {t('newEventButton')}
-                  </button>
-                  <div className="border-t border-gray-200 my-1"></div>
-                  <button 
-                    onClick={() => { onShowSalesReport(); setMenuOpen(false); }}
-                    className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-green-600 w-full text-left"
-                  >
-                    <BarChart3 className="inline mr-2 h-4 w-4" /> {t('todaysSaleReport')}
-                  </button>
-                  <button 
-                    onClick={handleExportData}
-                    className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-green-600 w-full text-left"
-                  >
-                    <Download className="inline mr-2 h-4 w-4" /> {t('exportData')}
-                  </button>
-                  <button 
-                    onClick={handleImportData}
-                    className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-green-600 w-full text-left"
-                  >
-                    <Upload className="inline mr-2 h-4 w-4" /> {t('importData')}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
+        
+        {/* Dropdown Menu */}
+        {menuOpen && (
+          <div id="menuDropdown" className="absolute top-full left-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+            <div className="py-1">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-gray-700 hover:bg-gray-100" 
+                onClick={() => {
+                  onNewEvent();
+                  setMenuOpen(false);
+                }}
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                {t('newEventButton')}
+              </Button>
+
+              <Link to="/event-management">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-gray-700 hover:bg-gray-100" 
+                  onClick={() => {
+                    setMenuOpen(false);
+                  }}
+                >
+                  <Hammer className="mr-2 h-4 w-4" />
+                  {t('eventsManagement')}
+                </Button>
+              </Link>
+
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-gray-700 hover:bg-gray-100"
+                onClick={() => {
+                  onShowSalesReport();
+                  setMenuOpen(false);
+                }}
+              >
+                <BarChart2 className="mr-2 h-4 w-4" />
+                {t('reportsMenu')}
+              </Button>
+
+              <hr className="my-1 border-gray-200" />
+
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-gray-700 hover:bg-gray-100"
+                onClick={() => {
+                  handleExportData();
+                  setMenuOpen(false);
+                }}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                {t('exportData')}
+              </Button>
+
+              <label className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                <Upload className="mr-2 h-4 w-4" />
+                <span>{t('importData')}</span>
+                <input 
+                  type="file" 
+                  accept=".json" 
+                  className="hidden" 
+                  onChange={(e) => {
+                    handleImportData(e);
+                    setMenuOpen(false);
+                  }} 
+                />
+              </label>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
