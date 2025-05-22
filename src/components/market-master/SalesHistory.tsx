@@ -4,6 +4,15 @@ import { useAppState } from './AppStateContext';
 import { Banknote, CreditCard, Smartphone } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import EventSelector from './EventSelector';
+import { format, parseISO } from 'date-fns';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 
 const SalesHistory: React.FC = () => {
   const { state, getSalesByEventId } = useAppState();
@@ -14,6 +23,16 @@ const SalesHistory: React.FC = () => {
     ? getSalesByEventId(selectedEventId)
     : state.salesHistory;
   
+  const formatDateTime = (isoString: string) => {
+    try {
+      const date = parseISO(isoString);
+      return format(date, 'MMM d, yyyy h:mm a');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return isoString;
+    }
+  };
+
   if (salesData.length === 0) {
     return (
       <div>
@@ -21,32 +40,27 @@ const SalesHistory: React.FC = () => {
           <EventSelector value={selectedEventId} onEventChange={setSelectedEventId} />
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('tableHeaderTime')}</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('tableHeaderItems')}</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('tableHeaderPayment')}</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('tableHeaderTotal')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td colSpan={4} className="px-4 py-4 text-center text-gray-500 italic">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('tableHeaderDateTime')}</TableHead>
+                <TableHead>{t('tableHeaderItems')}</TableHead>
+                <TableHead>{t('tableHeaderPayment')}</TableHead>
+                <TableHead>{t('tableHeaderTotal')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell colSpan={4} className="text-center text-gray-500 italic">
                   {t('noSales')}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
       </div>
     );
   }
-
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
 
   return (
     <div>
@@ -54,16 +68,16 @@ const SalesHistory: React.FC = () => {
         <EventSelector value={selectedEventId} onEventChange={setSelectedEventId} />
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('tableHeaderTime')}</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('tableHeaderItems')}</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('tableHeaderPayment')}</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{t('tableHeaderTotal')}</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('tableHeaderDateTime')}</TableHead>
+              <TableHead>{t('tableHeaderItems')}</TableHead>
+              <TableHead>{t('tableHeaderPayment')}</TableHead>
+              <TableHead>{t('tableHeaderTotal')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {salesData.map(sale => {
               const itemsList = sale.items.map(item => 
                 `${item.quantity} × ${item.name}`
@@ -79,18 +93,18 @@ const SalesHistory: React.FC = () => {
               }
               
               return (
-                <tr key={sale.id}>
-                  <td className="px-4 py-3 text-sm">{formatDate(sale.timestamp)}</td>
-                  <td className="px-4 py-3 text-sm">{itemsList}</td>
-                  <td className="px-4 py-3 text-sm">
+                <TableRow key={sale.id}>
+                  <TableCell className="text-sm">{formatDateTime(sale.timestamp)}</TableCell>
+                  <TableCell className="text-sm">{itemsList}</TableCell>
+                  <TableCell className="text-sm">
                     {methodIcon} {t(sale.paymentMethod === 'cash' ? 'paymentCash' : sale.paymentMethod === 'transfer' ? 'paymentCard' : 'paymentVenmo')}
-                  </td>
-                  <td className="px-4 py-3 text-sm font-bold">${sale.total.toFixed(2)}</td>
-                </tr>
+                  </TableCell>
+                  <TableCell className="text-sm font-bold">${sale.total.toFixed(2)}</TableCell>
+                </TableRow>
               );
             })}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

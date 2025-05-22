@@ -25,18 +25,14 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, eventId }) => 
   const eventToEdit = eventId ? state.events.find(event => event.id === eventId) || null : null;
   
   const onSubmit = (values: FormValues) => {
-    // Create timezone-safe dates by setting to noon UTC
-    // This prevents any timezone conversion issues when storing as ISO string
-    const startDate = new Date(values.startDate);
-    startDate.setUTCHours(12, 0, 0, 0);
-    
-    const endDate = new Date(values.endDate);
-    endDate.setUTCHours(12, 0, 0, 0);
+    // Create timezone-safe dates by explicitly formatting YYYY-MM-DD
+    const startDateStr = values.startDate.split('T')[0]; // Ensure we have just the date part
+    const endDateStr = values.endDate.split('T')[0]; // Ensure we have just the date part
     
     const eventData = {
       name: values.name,
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
+      startDate: startDateStr,
+      endDate: endDateStr,
       location: values.location || "",
       cost: parseFloat(values.cost),
       startTime: new Date().toISOString()

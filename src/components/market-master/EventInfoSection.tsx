@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppState } from './AppStateContext';
 import { useLanguage } from './LanguageContext';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 const EventInfoSection: React.FC = () => {
   const { state } = useAppState();
@@ -11,11 +11,16 @@ const EventInfoSection: React.FC = () => {
   
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
-    // Parse the date string properly (assuming YYYY-MM-DD format)
-    const [year, month, day] = dateString.split('-').map(Number);
-    // JavaScript months are 0-indexed (0 = January, 11 = December)
-    const date = new Date(year, month - 1, day);
-    return format(date, 'MMM d, yyyy');
+    
+    // Parse the date string properly from YYYY-MM-DD format
+    try {
+      // Using parse() with explicit format to ensure reliable date parsing
+      const date = parse(dateString, 'yyyy-MM-dd', new Date());
+      return format(date, 'MMM d, yyyy');
+    } catch (error) {
+      console.error('Error parsing date:', error);
+      return dateString; // Fallback to original string if parsing fails
+    }
   };
   
   return (
