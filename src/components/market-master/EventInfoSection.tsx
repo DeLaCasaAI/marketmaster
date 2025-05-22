@@ -12,16 +12,17 @@ const EventInfoSection: React.FC = () => {
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     
-    // Parse the date string properly from YYYY-MM-DD format
     try {
-      // Using parse() with explicit format to ensure reliable date parsing
-      const date = parse(dateString, 'yyyy-MM-dd', new Date());
-      return format(date, 'MMM d, yyyy');
+      // Parse the date string properly from YYYY-MM-DD format
+      const parsedDate = parse(dateString, 'yyyy-MM-dd', new Date());
+      return format(parsedDate, 'MMM d, yyyy');
     } catch (error) {
       console.error('Error parsing date:', error);
       return dateString; // Fallback to original string if parsing fails
     }
   };
+  
+  console.log('Current event in EventInfoSection:', state.currentEvent);
   
   return (
     <Card className="mb-6">

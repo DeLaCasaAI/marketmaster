@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppState } from '@/components/market-master/AppStateContext';
 import { useLanguage } from '@/components/market-master/LanguageContext';
 import HeaderSection from '@/components/market-master/HeaderSection';
@@ -33,6 +33,12 @@ const MarketMaster: React.FC = () => {
   const [showSaleCompleteModal, setShowSaleCompleteModal] = useState(false);
   const [showSalesReportModal, setShowSalesReportModal] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(true);
+
+  // Log the current event when the component mounts or when state.currentEvent changes
+  useEffect(() => {
+    console.log('Current event in MarketMaster:', state.currentEvent);
+    console.log('All events:', state.events);
+  }, [state.currentEvent, state.events]);
 
   const handleCompleteSale = () => {
     completeSale();

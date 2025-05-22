@@ -39,6 +39,12 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, eventId }) => 
       startTime: new Date().toISOString()
     };
 
+    console.log('Saving event with dates:', {
+      startDate: startDateStr,
+      endDate: endDateStr,
+      formattedEvent: eventData
+    });
+
     if (eventId) {
       updateEvent(eventId, eventData);
     } else {
