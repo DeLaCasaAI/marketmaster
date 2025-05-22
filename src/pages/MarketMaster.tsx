@@ -32,6 +32,7 @@ import SalesReportModal from '@/components/market-master/modals/SalesReportModal
 import { useAppState } from '@/components/market-master/AppStateContext';
 import "@/styles/marketmaster.css";
 import LanguageSwitcher from '../components/market-master/LanguageSwitcher';
+import { useLanguage } from '../components/market-master/LanguageContext';
 
 const MarketMaster: React.FC = () => {
   const { 
@@ -42,6 +43,8 @@ const MarketMaster: React.FC = () => {
     setPaymentMethod,
     calculateTodaysSales
   } = useAppState();
+
+  const { t } = useLanguage();
 
   const [showProductModal, setShowProductModal] = useState(false);
   const [showDiscountModal, setShowDiscountModal] = useState(false);
