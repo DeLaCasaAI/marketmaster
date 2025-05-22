@@ -1,0 +1,44 @@
+
+import React from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Check } from 'lucide-react';
+
+interface SaleCompleteModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  total: number;
+  paymentMethod: string;
+}
+
+const SaleCompleteModal: React.FC<SaleCompleteModalProps> = ({ isOpen, onClose, total, paymentMethod }) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-sm text-center">
+        <div className="flex flex-col items-center justify-center mb-6">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <Check className="h-8 w-8 text-green-600" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Sale Complete!</h3>
+          <p className="text-gray-600">Total: <span className="font-bold">${total.toFixed(2)}</span></p>
+          <p className="text-gray-600">Paid with: <span className="font-bold">{paymentMethod}</span></p>
+        </div>
+        
+        <DialogFooter className="justify-center">
+          <Button 
+            onClick={onClose}
+            className="bg-green-600 hover:bg-green-700 px-6"
+          >
+            Done
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default SaleCompleteModal;
