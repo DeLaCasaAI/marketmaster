@@ -166,19 +166,33 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     if (state.events.length > 0) {
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0); // Set to start of day
       
       const activeEvent = state.events.find(event => {
-        const startDate = new Date(event.startDate);
-        startDate.setHours(0, 0, 0, 0);
+        // Parse the date from YYYY-MM-DD format properly
+        const [startYear, startMonth, startDay] = event.startDate.split('-').map(Number);
+        const [endYear, endMonth, endDay] = event.endDate.split('-').map(Number);
         
-        const endDate = new Date(event.endDate);
-        endDate.setHours(23, 59, 59, 999);
+        // Create Date objects with time set to start/end of day to handle same-day events correctly
+        const startDate = new Date(startYear, startMonth - 1, startDay);
+        startDate.setHours(0, 0, 0, 0); // Start of day
+        
+        const endDate = new Date(endYear, endMonth - 1, endDay);
+        endDate.setHours(23, 59, 59, 999); // End of day
+        
+        // Debug the date comparison
+        console.log('Comparing dates:', {
+          today: today.toISOString(),
+          eventStart: startDate.toISOString(),
+          eventEnd: endDate.toISOString(),
+          isEventActive: today >= startDate && today <= endDate
+        });
         
         return today >= startDate && today <= endDate;
       });
       
       if (activeEvent && !state.currentEvent) {
+        console.log('Setting active event:', activeEvent);
         setState(prevState => ({
           ...prevState,
           currentEvent: activeEvent,
@@ -189,10 +203,13 @@ export const AppStateProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // If there's no active event but we have a current event set
         // Check if the current event is still valid
         const currentEventStillValid = state.events.find(event => {
-          const startDate = new Date(event.startDate);
+          const [startYear, startMonth, startDay] = event.startDate.split('-').map(Number);
+          const [endYear, endMonth, endDay] = event.endDate.split('-').map(Number);
+          
+          const startDate = new Date(startYear, startMonth - 1, startDay);
           startDate.setHours(0, 0, 0, 0);
           
-          const endDate = new Date(event.endDate);
+          const endDate = new Date(endYear, endMonth - 1, endDay);
           endDate.setHours(23, 59, 59, 999);
           
           const eventId = state.currentEvent?.id || -1;
