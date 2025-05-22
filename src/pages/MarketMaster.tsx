@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -32,6 +31,7 @@ import SaleCompleteModal from '@/components/market-master/modals/SaleCompleteMod
 import SalesReportModal from '@/components/market-master/modals/SalesReportModal';
 import { useAppState } from '@/components/market-master/AppStateContext';
 import "@/styles/marketmaster.css";
+import LanguageSwitcher from '../components/market-master/LanguageSwitcher';
 
 const MarketMaster: React.FC = () => {
   const { 
@@ -132,18 +132,15 @@ const MarketMaster: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Header */}
-      <header className="mb-8">
-        <div className="flex justify-between items-center">
+    <div className="min-h-screen bg-background">
+      <header className="border-b p-4 sticky top-0 z-10 bg-background">
+        <div className="container flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-green-700">
-              <Store className="inline mr-2" />
-              MarketMaster
-            </h1>
-            <p className="text-gray-600">Track your farmer's market sales with ease</p>
+            <h1 className="text-2xl font-bold">{t('headerTitle')}</h1>
+            <p className="text-sm text-muted-foreground">{t('headerSubtitle')}</p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <div className="bg-white p-3 rounded-lg shadow-sm">
               <span className="text-gray-500">Today's Sales:</span>
               <span className="font-bold text-green-600 ml-2">${calculateTodaysSales().toFixed(2)}</span>

@@ -19,7 +19,7 @@ const LanguageSwitcher: React.FC = () => {
       onClick={toggleLanguage}
     >
       <Globe className="h-4 w-4" />
-      <span>{t('languageButtonText')}</span>
+      <span>{language === 'en' ? 'Español' : 'English'}</span>
     </Button>
   );
 };
