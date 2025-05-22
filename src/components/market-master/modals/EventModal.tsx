@@ -63,29 +63,31 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, eventId }) => 
     }
   });
 
-  // Load event data when editing
+  // Load event data when editing - use eventId AND isOpen in dependency array to prevent infinite loops
   useEffect(() => {
-    if (eventId) {
-      const eventToEdit = state.events.find(event => event.id === eventId);
-      if (eventToEdit) {
+    if (isOpen) {
+      if (eventId) {
+        const eventToEdit = state.events.find(event => event.id === eventId);
+        if (eventToEdit) {
+          form.reset({
+            name: eventToEdit.name,
+            startDate: new Date(eventToEdit.startDate),
+            endDate: new Date(eventToEdit.endDate),
+            location: eventToEdit.location || "",
+            cost: eventToEdit.cost.toString()
+          });
+        }
+      } else {
         form.reset({
-          name: eventToEdit.name,
-          startDate: new Date(eventToEdit.startDate),
-          endDate: new Date(eventToEdit.endDate),
-          location: eventToEdit.location || "",
-          cost: eventToEdit.cost.toString()
+          name: "",
+          startDate: today,
+          endDate: today,
+          location: "",
+          cost: "0"
         });
       }
-    } else {
-      form.reset({
-        name: "",
-        startDate: today,
-        endDate: today,
-        location: "",
-        cost: "0"
-      });
     }
-  }, [eventId, form, today, state.events]);
+  }, [eventId, isOpen, form, today, state.events]);
 
   const onSubmit = (values: FormValues) => {
     const eventData = {
