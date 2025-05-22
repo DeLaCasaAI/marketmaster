@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -93,7 +94,7 @@ const MarketMaster: React.FC = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success("Data exported successfully");
+    toast.success(t('dataImportedSuccessfully'));
     setMenuOpen(false);
   };
 
@@ -112,10 +113,10 @@ const MarketMaster: React.FC = () => {
           if (typeof result === 'string') {
             // This would be handled in the AppStateContext
             // updateStateFromImport(JSON.parse(result));
-            toast.success("Data imported successfully");
+            toast.success(t('dataImportedSuccessfully'));
           }
         } catch (error) {
-          toast.error("Error importing data");
+          toast.error(t('errorImportingData') + error);
         }
       };
       reader.readAsText(file);
@@ -126,7 +127,7 @@ const MarketMaster: React.FC = () => {
 
   const handleCompleteSale = () => {
     if (state.currentSale.items.length === 0) {
-      toast.error("Cannot complete an empty sale");
+      toast.error(t('emptyReceiptMessage'));
       return;
     }
     
@@ -139,13 +140,12 @@ const MarketMaster: React.FC = () => {
       <header className="border-b p-4 sticky top-0 z-10 bg-background">
         <div className="container flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">{t('headerTitle')}</h1>
-            <p className="text-sm text-muted-foreground">{t('headerSubtitle')}</p>
+            <h1 className="text-2xl font-bold">MarketMaster by DeLaCasa</h1>
           </div>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <div className="bg-white p-3 rounded-lg shadow-sm">
-              <span className="text-gray-500">Today's Sales:</span>
+              <span className="text-gray-500">{t('todaysSalesLabel')}</span>
               <span className="font-bold text-green-600 ml-2">${calculateTodaysSales().toFixed(2)}</span>
             </div>
             <div className="relative">
@@ -154,7 +154,7 @@ const MarketMaster: React.FC = () => {
                 onClick={() => setMenuOpen(!menuOpen)} 
                 className="bg-green-600 hover:bg-green-700"
               >
-                <span className="mr-2">Menu</span>
+                <span className="mr-2">{t('reportsMenu')}</span>
               </Button>
               
               {menuOpen && (
@@ -164,26 +164,26 @@ const MarketMaster: React.FC = () => {
                       onClick={() => { setShowEventModal(true); setMenuOpen(false); }}
                       className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-green-600 w-full text-left"
                     >
-                      <Plus className="inline mr-2 h-4 w-4" /> New Event
+                      <Plus className="inline mr-2 h-4 w-4" /> {t('newEventButton')}
                     </button>
                     <div className="border-t border-gray-200 my-1"></div>
                     <button 
                       onClick={() => { setShowSalesReportModal(true); setMenuOpen(false); }}
                       className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-green-600 w-full text-left"
                     >
-                      <BarChart3 className="inline mr-2 h-4 w-4" /> Today's Sale Report
+                      <BarChart3 className="inline mr-2 h-4 w-4" /> {t('todaysSaleReport')}
                     </button>
                     <button 
                       onClick={handleExportData}
                       className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-green-600 w-full text-left"
                     >
-                      <Download className="inline mr-2 h-4 w-4" /> Export Data
+                      <Download className="inline mr-2 h-4 w-4" /> {t('exportData')}
                     </button>
                     <button 
                       onClick={handleImportData}
                       className="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100 hover:text-green-600 w-full text-left"
                     >
-                      <Upload className="inline mr-2 h-4 w-4" /> Import Data
+                      <Upload className="inline mr-2 h-4 w-4" /> {t('importData')}
                     </button>
                   </div>
                 </div>
@@ -199,9 +199,9 @@ const MarketMaster: React.FC = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-2xl font-semibold text-gray-800">
-                {state.currentEvent?.name || "No Event Selected"}
+                {state.currentEvent?.name || t('newEventButton')}
               </h2>
-              <p className="text-gray-600">{state.currentEvent?.location || "Create a new event to begin"}</p>
+              <p className="text-gray-600">{state.currentEvent?.location || t('eventLocationLabel')}</p>
             </div>
             <div className="mt-2 md:mt-0">
               {state.currentEvent && (
@@ -223,7 +223,7 @@ const MarketMaster: React.FC = () => {
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-xl">
-                  <ShoppingBag className="inline mr-2 text-green-600" /> Products
+                  <ShoppingBag className="inline mr-2 text-green-600" /> {t('productsTitle')}
                 </CardTitle>
                 <Button 
                   variant="ghost" 
@@ -245,7 +245,7 @@ const MarketMaster: React.FC = () => {
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-xl">
-                  <DollarSign className="inline mr-2 text-yellow-500" /> Discount Packs
+                  <DollarSign className="inline mr-2 text-yellow-500" /> {t('discountPacksTitle')}
                 </CardTitle>
                 <Button 
                   variant="ghost" 
@@ -270,20 +270,20 @@ const MarketMaster: React.FC = () => {
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-xl">
-                  <CreditCard className="inline mr-2 text-blue-500" /> Current Sale
+                  <CreditCard className="inline mr-2 text-blue-500" /> {t('currentSaleTitle')}
                 </CardTitle>
                 <div className="flex space-x-2">
                   <Button 
                     variant="outline"
                     onClick={clearCurrentSale}
                   >
-                    Clear
+                    {t('clearSaleButton')}
                   </Button>
                   <Button 
                     onClick={handleCompleteSale}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
-                    Complete Sale
+                    {t('completeSaleButton')}
                   </Button>
                 </div>
               </div>
@@ -294,13 +294,13 @@ const MarketMaster: React.FC = () => {
               
               {/* Quick Add Buttons */}
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-500 mb-2">QUICK ADD</h3>
+                <h3 className="text-sm font-semibold text-gray-500 mb-2">{t('quickAddTitle')}</h3>
                 <QuickAddButtons onAddToSale={addProductToSale} />
               </div>
 
               {/* Payment Method */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-500 mb-2">PAYMENT METHOD</h3>
+                <h3 className="text-sm font-semibold text-gray-500 mb-2">{t('paymentMethodTitle')}</h3>
                 <PaymentMethods 
                   selected={state.currentSale.paymentMethod}
                   onChange={setPaymentMethod}
@@ -313,7 +313,7 @@ const MarketMaster: React.FC = () => {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-xl">
-                <Calendar className="inline mr-2 text-purple-500" /> Today's Sales
+                <Calendar className="inline mr-2 text-purple-500" /> {t('salesHistoryTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
