@@ -78,3 +78,12 @@
 .event-selector {
     border-color: #10b981;
 }
+
+/* Header styles */
+.app-header {
+    @apply bg-green-600 text-white p-4 shadow-md relative;
+}
+
+.language-switcher {
+    @apply bg-white text-green-800 border-white hover:bg-green-100 hover:text-green-800;
+}

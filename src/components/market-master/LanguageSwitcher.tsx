@@ -15,7 +15,7 @@ const LanguageSwitcher: React.FC = () => {
     <Button 
       variant="outline" 
       size="sm" 
-      className="flex items-center gap-1" 
+      className="flex items-center gap-1 bg-white text-green-800 border-white hover:bg-green-100 hover:text-green-800" 
       onClick={toggleLanguage}
     >
       <Globe className="h-4 w-4" />

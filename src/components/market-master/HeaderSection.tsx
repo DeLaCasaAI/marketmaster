@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Menu, Calendar, BarChart2, Download, Upload, Hammer } from 'lucide-react';
 import { useAppState } from './AppStateContext';
@@ -73,7 +72,7 @@ const HeaderSection: React.FC<HeaderProps> = ({ onNewEvent, onShowSalesReport })
   };
 
   return (
-    <header className="bg-green-600 text-white p-4 shadow-md relative">
+    <header className="app-header">
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center">
           <Button 
