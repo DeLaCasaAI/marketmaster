@@ -21,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useAppState } from '../AppStateContext';
+import { useLanguage } from '../LanguageContext';
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -44,6 +45,7 @@ const formSchema = z.object({
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, editingProductId }) => {
   const { state, addProduct, editProduct } = useAppState();
   const [isEditing, setIsEditing] = useState(false);
+  const { t } = useLanguage();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -102,7 +104,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, editingPro
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('editProductTitle') : t('addProductModalTitle')}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -112,7 +114,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, editingPro
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product Name</FormLabel>
+                  <FormLabel>{t('productNameLabel')}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -126,7 +128,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, editingPro
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price ($)</FormLabel>
+                    <FormLabel>{t('productPriceLabel')}</FormLabel>
                     <FormControl>
                       <Input {...field} type="number" step="0.01" min="0" />
                     </FormControl>
@@ -138,7 +140,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, editingPro
                 name="cost"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cost ($)</FormLabel>
+                    <FormLabel>{t('productCostLabel')}</FormLabel>
                     <FormControl>
                       <Input {...field} type="number" step="0.01" min="0" />
                     </FormControl>
@@ -152,20 +154,20 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, editingPro
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>{t('productCategoryLabel')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
+                        <SelectValue placeholder={t('selectProductPlaceholder')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="cookies">Cookies</SelectItem>
-                      <SelectItem value="cakes">Cakes</SelectItem>
-                      <SelectItem value="almonds">Almonds</SelectItem>
-                      <SelectItem value="candles">Candles</SelectItem>
-                      <SelectItem value="handicrafts">Handicrafts</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      <SelectItem value="cookies">{t('categoryCookies')}</SelectItem>
+                      <SelectItem value="cakes">{t('categoryCakes')}</SelectItem>
+                      <SelectItem value="almonds">{t('categoryAlmonds')}</SelectItem>
+                      <SelectItem value="candles">{t('categoryCandles')}</SelectItem>
+                      <SelectItem value="handicrafts">{t('categoryHandicrafts')}</SelectItem>
+                      <SelectItem value="other">{t('categoryOther')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -174,10 +176,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, editingPro
 
             <DialogFooter className="flex justify-end space-x-3 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                {t('cancelButton')}
               </Button>
               <Button type="submit" className="bg-green-600 hover:bg-green-700">
-                {isEditing ? 'Update Product' : 'Save Product'}
+                {isEditing ? t('saveProductButton') : t('saveProductButton')}
               </Button>
             </DialogFooter>
           </form>

@@ -22,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useAppState, Discount } from '../AppStateContext';
+import { useLanguage } from '../LanguageContext';
 
 interface DiscountModalProps {
   isOpen: boolean;
@@ -46,6 +47,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
   const [isEditing, setIsEditing] = useState(false);
   const [discountType, setDiscountType] = useState<"bundle" | "percentage" | "fixed">("bundle");
   const [showWithProduct, setShowWithProduct] = useState(false);
+  const { t } = useLanguage();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -172,7 +174,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Discount Pack' : 'Create Discount Pack'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('addDiscountModalTitle') : t('addDiscountModalTitle')}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -182,7 +184,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Discount Name</FormLabel>
+                  <FormLabel>{t('discountNameLabel')}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -195,7 +197,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Discount Type</FormLabel>
+                  <FormLabel>{t('discountTypeLabel')}</FormLabel>
                   <Select 
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -205,13 +207,13 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select discount type" />
+                        <SelectValue placeholder={t('selectProductPlaceholder')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="bundle">Bundle (e.g., 2 for $5)</SelectItem>
-                      <SelectItem value="percentage">Percentage Off</SelectItem>
-                      <SelectItem value="fixed">Fixed Amount Off</SelectItem>
+                      <SelectItem value="bundle">{t('discountTypeBundle')}</SelectItem>
+                      <SelectItem value="percentage">{t('discountTypePercentage')}</SelectItem>
+                      <SelectItem value="fixed">{t('discountTypeFixed')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormItem>
@@ -226,7 +228,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
                   name="bundleQuantity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Quantity Required</FormLabel>
+                      <FormLabel>{t('bundleQuantityLabel')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="number" min="1" />
                       </FormControl>
@@ -238,7 +240,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
                   name="bundlePrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bundle Price ($)</FormLabel>
+                      <FormLabel>{t('bundlePriceLabel')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="number" step="0.01" min="0" />
                       </FormControl>
@@ -255,7 +257,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
                 name="percentageValue"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Percentage Off</FormLabel>
+                    <FormLabel>{t('percentageValueLabel')}</FormLabel>
                     <div className="flex items-center">
                       <FormControl>
                         <Input {...field} type="number" min="1" max="100" className="w-full" />
@@ -275,7 +277,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
                   name="fixedAmount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount Off ($)</FormLabel>
+                      <FormLabel>{t('fixedAmountLabel')}</FormLabel>
                       <FormControl>
                         <Input {...field} type="number" step="0.01" min="0" />
                       </FormControl>
@@ -296,7 +298,7 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
                           }} 
                         />
                       </FormControl>
-                      <FormLabel className="mt-0">When purchased with another product</FormLabel>
+                      <FormLabel className="mt-0">{t('withProductLabel')}</FormLabel>
                     </FormItem>
                   )}
                 />
@@ -307,11 +309,11 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
                     name="withProductId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Required Product</FormLabel>
+                        <FormLabel>{t('withProductLabel')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select product" />
+                              <SelectValue placeholder={t('selectProductPlaceholder')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -334,11 +336,11 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
               name="productId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Apply to Product</FormLabel>
+                  <FormLabel>{t('applyToProductLabel')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select product" />
+                        <SelectValue placeholder={t('selectProductPlaceholder')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -355,10 +357,10 @@ const DiscountModal: React.FC<DiscountModalProps> = ({ isOpen, onClose, editingD
 
             <DialogFooter className="flex justify-end space-x-3 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                {t('cancelButton')}
               </Button>
               <Button type="submit" className="bg-yellow-500 hover:bg-yellow-600">
-                {isEditing ? 'Update Discount' : 'Save Discount'}
+                {isEditing ? t('saveDiscountButton') : t('saveDiscountButton')}
               </Button>
             </DialogFooter>
           </form>

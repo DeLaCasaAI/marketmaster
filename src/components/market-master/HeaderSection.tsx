@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Plus, BarChart3, Download, Upload } from 'lucide-react';
+import { Plus, BarChart3, Download, Upload, Menu } from 'lucide-react';
 import { useAppState } from './AppStateContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from './LanguageContext';
@@ -52,7 +52,6 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({ onNewEvent, onShowSalesRe
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
     toast.success(t('dataImportedSuccessfully'));
     setMenuOpen(false);
   };
@@ -102,7 +101,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({ onNewEvent, onShowSalesRe
               onClick={() => setMenuOpen(!menuOpen)} 
               className="bg-green-600 hover:bg-green-700"
             >
-              <span className="mr-2">{t('reportsMenu')}</span>
+              <Menu className="h-5 w-5" />
             </Button>
             
             {menuOpen && (

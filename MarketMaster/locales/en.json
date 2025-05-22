@@ -1,3 +1,4 @@
+
 {
   "appTitle": "MarketMaster - Farmer's Market Sales Tracker",
   "headerTitle": "MarketMaster",
@@ -27,6 +28,7 @@
   "tableHeaderTotal": "Total",
   "noSales": "No sales recorded yet",
   "addProductModalTitle": "Add New Product",
+  "editProductTitle": "Edit Product",
   "productNameLabel": "Product Name",
   "productPriceLabel": "Price ($)",
   "productCostLabel": "Cost ($)",
@@ -65,7 +67,7 @@
   "minItemsLabel": "Minimum Items Required",
   "minTotalLabel": "Minimum Purchase Total ($)",
   "percentageValueLabel": "Percentage Off",
-  "fixedAmountLabel": "Amount Off ($",
+  "fixedAmountLabel": "Amount Off ($)",
   "withProductLabel": "When purchased with another product",
   "startEventButton": "Start Event",
   "saleCompleteModalTitle": "Sale Complete!",

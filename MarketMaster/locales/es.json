@@ -1,3 +1,4 @@
+
 {
   "appTitle": "MarketMaster - Rastreador de Ventas del Mercado Agrícola",
   "headerTitle": "MarketMaster",
@@ -27,6 +28,7 @@
   "tableHeaderTotal": "Total",
   "noSales": "No se han registrado ventas aún",
   "addProductModalTitle": "Agregar Nuevo Producto",
+  "editProductTitle": "Editar Producto",
   "productNameLabel": "Nombre del Producto",
   "productPriceLabel": "Precio ($)",
   "productCostLabel": "Costo ($)",
@@ -65,7 +67,7 @@
   "minItemsLabel": "Mínimo de Artículos Requeridos",
   "minTotalLabel": "Mínimo de Compra Total ($)",
   "percentageValueLabel": "Porcentaje de Descuento",
-  "fixedAmountLabel": "Monto de Descuento ($",
+  "fixedAmountLabel": "Monto de Descuento ($)",
   "withProductLabel": "Cuando se compra con otro producto",
   "startEventButton": "Iniciar Evento",
   "saleCompleteModalTitle": "¡Venta Completada!",
