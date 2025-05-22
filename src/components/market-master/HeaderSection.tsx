@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu, Calendar, BarChart2, Download, Upload, Hammer } from 'lucide-react';
+import { Menu, Calendar, BarChart2, Download, Upload, Hammer, ExternalLink } from 'lucide-react';
 import { useAppState } from './AppStateContext';
 import { useLanguage } from './LanguageContext';
 import { Button } from "@/components/ui/button";
@@ -144,6 +144,17 @@ const HeaderSection: React.FC<HeaderProps> = ({ onNewEvent, onShowSalesReport })
                 <BarChart2 className="mr-2 h-4 w-4" />
                 {t('reportsMenu')}
               </Button>
+
+              <a 
+                href="https://delacasa.app" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => setMenuOpen(false)}
+              >
+                <ExternalLink className="mr-2 h-4 w-4" />
+                DeLaCasa
+              </a>
 
               <hr className="my-1 border-gray-200" />
 
