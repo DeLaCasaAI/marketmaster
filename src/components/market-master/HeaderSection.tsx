@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Menu, Calendar, BarChart2, Download, Upload, Hammer } from 'lucide-react';
 import { useAppState } from './AppStateContext';
@@ -78,14 +79,13 @@ const HeaderSection: React.FC<HeaderProps> = ({ onNewEvent, onShowSalesReport })
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-white mr-2 p-1 hover:bg-green-700"
+            className="text-white mr-2 p-1 hover:bg-gray-700"
             onClick={toggleMenu}
           >
             <Menu size={24} />
           </Button>
           <div>
             <h1 className="text-xl font-bold">{t('headerTitle')}</h1>
-            <p className="text-xs opacity-80">{t('headerSubtitle')}</p>
           </div>
         </div>
         
