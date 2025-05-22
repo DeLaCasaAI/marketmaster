@@ -47,14 +47,16 @@ const EventForm: React.FC<EventFormProps> = ({
   
   // Create a date object for today that won't be affected by timezone issues
   const today = new Date();
+  today.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
   
-  // Make properly parsed dates from stored ISO strings
+  // Parse dates properly from ISO strings
   const getDateFromISOString = (dateString: string | undefined) => {
     if (!dateString) return today;
-    // Parse the date and ensure it's treated as UTC
+    
+    // Parse the date from YYYY-MM-DD format
     const [year, month, day] = dateString.split('-').map(Number);
-    // JavaScript months are 0-indexed (0 = January, 11 = December)
-    const date = new Date(year, month - 1, day);
+    // Create a new date, setting to noon to avoid timezone issues
+    const date = new Date(year, month - 1, day, 12, 0, 0, 0);
     return date;
   };
   

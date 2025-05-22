@@ -10,6 +10,7 @@ import {
 import { useAppState } from '../AppStateContext';
 import { useLanguage } from '../LanguageContext';
 import EventForm, { FormValues } from './EventForm';
+import { format } from 'date-fns';
 
 interface EventModalProps {
   isOpen: boolean;
@@ -25,9 +26,9 @@ const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, eventId }) => 
   const eventToEdit = eventId ? state.events.find(event => event.id === eventId) || null : null;
   
   const onSubmit = (values: FormValues) => {
-    // Create timezone-safe dates by explicitly formatting YYYY-MM-DD
-    const startDateStr = values.startDate.split('T')[0]; // Ensure we have just the date part
-    const endDateStr = values.endDate.split('T')[0]; // Ensure we have just the date part
+    // Format dates to YYYY-MM-DD string format - this ensures consistent date handling
+    const startDateStr = format(values.startDate, 'yyyy-MM-dd');
+    const endDateStr = format(values.endDate, 'yyyy-MM-dd');
     
     const eventData = {
       name: values.name,
