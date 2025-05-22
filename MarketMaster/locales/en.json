@@ -89,5 +89,6 @@
   "importData": "Import Data",
   "dataImportedSuccessfully": "Data imported successfully!",
   "errorImportingData": "Error importing data: ",
-  "languageButtonText": "English"
+  "languageButtonText": "English",
+  "savedLabel": "SAVED"
 }

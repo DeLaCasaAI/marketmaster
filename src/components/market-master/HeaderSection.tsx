@@ -13,7 +13,7 @@ interface HeaderSectionProps {
 }
 
 const HeaderSection: React.FC<HeaderSectionProps> = ({ onNewEvent, onShowSalesReport }) => {
-  const { calculateTodaysSales } = useAppState();
+  const { calculateTodaysSales, state, updateStateFromImport } = useAppState();
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   
@@ -40,8 +40,13 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({ onNewEvent, onShowSalesRe
 
   const handleExportData = () => {
     const data = JSON.stringify({
-      // Export data structure would be defined here
-      // This is a placeholder for the actual implementation
+      products: state.products,
+      discounts: state.discounts,
+      salesHistory: state.salesHistory,
+      currentEvent: state.currentEvent,
+      eventStartDate: state.eventStartDate,
+      eventEndDate: state.eventEndDate,
+      language: state.language
     });
     
     const blob = new Blob([data], { type: 'application/json' });
@@ -52,6 +57,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({ onNewEvent, onShowSalesRe
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    URL.revokeObjectURL(url);
     toast.success(t('dataImportedSuccessfully'));
     setMenuOpen(false);
   };
@@ -69,8 +75,8 @@ const HeaderSection: React.FC<HeaderSectionProps> = ({ onNewEvent, onShowSalesRe
         try {
           const result = e.target?.result;
           if (typeof result === 'string') {
-            // This would be handled in the AppStateContext
-            // updateStateFromImport(JSON.parse(result));
+            const data = JSON.parse(result);
+            updateStateFromImport(data);
             toast.success(t('dataImportedSuccessfully'));
           }
         } catch (error) {
